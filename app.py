@@ -68,8 +68,8 @@ def normalize_phone():
             return jsonify({"error": "phone_number is required"}), 400
         
         parsed_number = phonenumbers.parse(phone_number, country_code)
-        
-        if not phonenumbers.is_valid_number(parsed_number):
+
+        if not phonenumbers.is_possible_number(parsed_number):
             return jsonify({"error": "Invalid phone number"}), 400
         
         format_map = {
