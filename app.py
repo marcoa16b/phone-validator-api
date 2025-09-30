@@ -92,5 +92,52 @@ def normalize_phone():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/phone-number', methods=['POST'])
+def process_phone_number():
+   try:
+       data = request.get_json()
+       phone_number = data.get('phone_number')
+
+       if not phone_number:
+           return jsonify({"error": "phone_number is required"}), 400
+
+       # Attempt to parse without country code (infer from number if possible)
+       try:
+           parsed_number = phonenumbers.parse(phone_number, None)
+       except NumberParseException:
+           return jsonify({"error": "Unable to parse phone number without country code. Please provide a country code or use international format (+countrycode...)."}), 400
+
+       # Validate
+       is_valid = phonenumbers.is_valid_number(parsed_number)
+       is_possible = phonenumbers.is_possible_number(parsed_number)
+
+       # Normalize
+       international_format = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+       national_format = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.NATIONAL)
+       e164_format = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
+
+       # Información adicional
+       country = geocoder.description_for_number(parsed_number, "es")
+       carrier_name = carrier.name_for_number(parsed_number, "es")
+       timezones = timezone.time_zones_for_number(parsed_number)
+
+       return jsonify({
+           "is_valid": is_valid,
+           "is_possible": is_possible,
+           "country_code": parsed_number.country_code,
+           "national_number": parsed_number.national_number,
+           "formats": {
+               "international": international_format,
+               "national": national_format,
+               "e164": e164_format
+           },
+           "location": country,
+           "carrier": carrier_name,
+           "timezones": list(timezones)
+       })
+
+   except Exception as e:
+       return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+   app.run(host='0.0.0.0', port=5000, debug=False)
