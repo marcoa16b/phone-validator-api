@@ -36,6 +36,7 @@ Validates and processes a phone number with an optional country code.
     "is_valid": true,
     "is_possible": true,
     "country_code": 1,
+    "country_code_alpha2": "US",
     "national_number": 1234567890,
     "formats": {
         "international": "+1 234-567-890",

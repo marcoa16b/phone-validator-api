@@ -40,6 +40,7 @@ def validate_phone():
             "is_valid": is_valid,
             "is_possible": is_possible,
             "country_code": parsed_number.country_code,
+            "country_code_alpha2": phonenumbers.region_code_for_number(parsed_number),
             "national_number": parsed_number.national_number,
             "formats": {
                 "international": international_format,
@@ -125,6 +126,7 @@ def process_phone_number():
            "is_valid": is_valid,
            "is_possible": is_possible,
            "country_code": parsed_number.country_code,
+           "country_code_alpha2": phonenumbers.region_code_for_number(parsed_number),
            "national_number": parsed_number.national_number,
            "formats": {
                "international": international_format,
